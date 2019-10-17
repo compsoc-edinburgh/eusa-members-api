@@ -2,7 +2,7 @@ const Nightmare = require('nightmare')
 const nightmare = Nightmare({ show: true })
 
 const fs        = require('fs')
-const config = JSON.parse(fs.readFileSync('./config.json'))
+const config = JSON.parse(fs.readFileSync('./instance/secret.json'))
 
 module.exports = () => {
     const nightmare = Nightmare({ show: false })
