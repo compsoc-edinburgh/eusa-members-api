@@ -1,0 +1,13 @@
+{
+  "name": "eusa-members-api",
+  "version": "1.0.0",
+  "description": "scrape the eusa website for the compsoc members list",
+  "main": "server.js",
+  "repository": "https://github.com/compsoc-edinburgh/eusa-members-api",
+  "author": "patrick kage",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1",
+    "nightmare": "^3.0.2"
+  }
+}
