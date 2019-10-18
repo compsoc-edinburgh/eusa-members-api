@@ -2,7 +2,7 @@ const Nightmare = require('nightmare')
 const nightmare = Nightmare({ show: true })
 
 const fs        = require('fs')
-const config = JSON.parse(fs.readFileSync('./instance/secret.json'))
+const secrets = JSON.parse(fs.readFileSync('./instance/secret.json'))
 
 module.exports = () => {
     const nightmare = Nightmare({ show: false })
@@ -12,8 +12,8 @@ module.exports = () => {
             .goto('https://www.eusa.ed.ac.uk/organisation/memberlist/8868/?sort=groups')
             .click('.student-login-block')
             .wait('#login')
-            .type('#login', config.email)
-            .type('#password', config.password)
+            .type('#login', secrets.email)
+            .type('#password', secrets.password)
             .click('[value=" Login now "]')
             .wait('.member_list_group')
             .evaluate(() => {

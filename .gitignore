@@ -1,5 +1,7 @@
 # random files
 .DS_Store
+instance/cache.json
+instance/secret.json
 
 # Logs
 logs
