@@ -23,16 +23,17 @@ const parseNameString = name => {
 
 module.exports = opts => {
     const DEBUG = (opts && opts.debug) || false
-    const nightmare = Nightmare({ 
+    const {orgID, groupID} = opts;
+    const nightmare = Nightmare({
         show: DEBUG,
         switches: {
             'ignore-gpu-blacklist': true
         }
     })
-    
+
     return new Promise((resolve, reject) => {
         nightmare
-            .goto('https://www.eusa.ed.ac.uk/organisation/memberlist/8868/?sort=groups')
+            .goto(`https://www.eusa.ed.ac.uk/organisation/memberlist/${orgID}/?sort=groups`)
             .click('.student-login-block')
             .wait('#login')
             .type('#login', secrets.email)
@@ -41,7 +42,7 @@ module.exports = opts => {
             .wait('.member_list_group')
             .evaluate(() => {
                 // executes in browser context
-                let table = document.querySelector('.member_list_group > h3 > a[href="/organisation/editmembers/8868/8872/?from=members"]').parentElement.parentElement
+                let table = document.querySelector(`.member_list_group > h3 > a[href="/organisation/editmembers/${orgID}/${groupID}/?from=members"]`).parentElement.parentElement
 
                 table = table.querySelector('.msl_table > tbody')
 
@@ -78,4 +79,3 @@ module.exports = opts => {
             })
     })
 }
-

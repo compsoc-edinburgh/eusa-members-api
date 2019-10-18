@@ -10,10 +10,13 @@ const cachefile      = config.cachefile
 const port           = config.port
 
 const writeScrape = async () => {
-    const members = await scrape_members()
+    const members = await scrape_members({
+        "orgID": "8868",
+        "groupID": "8872",
+    })
 
     const out = {
-        members: members, 
+        members: members,
         date: new Date().toISOString()
     }
 
