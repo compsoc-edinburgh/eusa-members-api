@@ -8,6 +8,7 @@
   "license": "MIT",
   "dependencies": {
     "express": "^4.17.1",
+    "luxon": "^1.19.3",
     "nightmare": "^3.0.2"
   }
 }

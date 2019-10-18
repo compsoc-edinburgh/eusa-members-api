@@ -1,11 +1,29 @@
-const Nightmare = require('nightmare')
-const nightmare = Nightmare({ show: true })
+const Nightmare    = require('nightmare')
+const { DateTime } = require('luxon')
 
-const fs        = require('fs')
+const fs      = require('fs')
 const secrets = JSON.parse(fs.readFileSync('./instance/secret.json'))
 
-module.exports = () => {
-    const nightmare = Nightmare({ show: false })
+const convertFromEUSADate = edate => {
+    return DateTime
+        .fromFormat(edate, 'dd/MM/yyyy HH:mm')
+        .toISO()
+}
+
+const parseNameString = name => {
+    const [ surname, forename ] = name.split(',')
+
+    return {
+        original: name,
+        last: surname.trim(),
+        first: forename.trim(),
+        full: `${forename} ${surname}`.trim()
+    }
+}
+
+module.exports = opts => {
+    const DEBUG = (opts && opts.debug) || false
+    const nightmare = Nightmare({ show: DEBUG })
     
     return new Promise((resolve, reject) => {
         nightmare
@@ -17,6 +35,7 @@ module.exports = () => {
             .click('[value=" Login now "]')
             .wait('.member_list_group')
             .evaluate(() => {
+                // executes in browser context
                 let table = document.querySelector('.member_list_group > h3 > a[href="/organisation/editmembers/8868/8872/?from=members"]').parentElement.parentElement
 
                 table = table.querySelector('.msl_table > tbody')
@@ -29,20 +48,27 @@ module.exports = () => {
                         name: tr.children[0].textContent,
                         student: tr.children[1].textContent,
                         joined: tr.children[2].textContent,
-                        expired: tr.children[3].textContent
+                        expires: tr.children[3].textContent
                     })
                 }
 
-                return JSON.stringify({
-                    members: out
-                })
+                return out
 
             })
             .end()
-            .then(function (result) {
-                resolve(result)
+            .then(members => {
+                // do date conversions without having to inject into the EUSA page
+                // (i.e. in the node.js context)
+                members = members.map(member => ({
+                    name: parseNameString(member.name),
+                    student: member.student,
+                    joined: convertFromEUSADate(member.joined),
+                    expires: convertFromEUSADate(member.expires)
+                }))
+
+                resolve(members)
             })
-            .catch(function (error) {
+            .catch(error => {
                 reject(error)
             })
     })

@@ -1,6 +1,7 @@
 const express        = require('express')
 const scrape_members = require('./scrape.js')
 const fs             = require('fs')
+const { DateTime }   = require('luxon')
 
 const config = JSON.parse(fs.readFileSync('./instance/config.json'))
 
@@ -12,7 +13,7 @@ const writeScrape = async () => {
     const members = await scrape_members()
 
     const out = {
-        members: JSON.parse(members).members, 
+        members: members, 
         date: new Date().toISOString()
     }
 
