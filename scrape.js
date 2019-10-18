@@ -21,8 +21,8 @@ const parseNameString = name => {
     }
 }
 
-module.exports = opts => {
-    const DEBUG = (opts && opts.debug) || false
+module.exports = (opts = {}) => {
+    const DEBUG = opts.debug === true;
     const {orgID, groupID} = opts;
     const nightmare = Nightmare({
         show: DEBUG,
