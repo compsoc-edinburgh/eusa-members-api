@@ -23,7 +23,12 @@ const parseNameString = name => {
 
 module.exports = opts => {
     const DEBUG = (opts && opts.debug) || false
-    const nightmare = Nightmare({ show: DEBUG })
+    const nightmare = Nightmare({ 
+        show: DEBUG,
+        switches: {
+            'ignore-gpu-blacklist': true
+        }
+    })
     
     return new Promise((resolve, reject) => {
         nightmare
