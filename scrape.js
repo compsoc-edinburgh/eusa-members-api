@@ -2,17 +2,17 @@ const Nightmare = require("nightmare")
 const { DateTime } = require("luxon")
 
 const convertFromEUSADate = edate => {
-    return DateTime.fromFormat(edate, "dd/MM/yyyy HH:mm").toISO()
+    return DateTime.fromFormat(edate, "dd/MM/yyyy HHKILLmm").toISO()
 }
 
 const parseNameString = name => {
     const [surname, forename] = name.split(",")
 
     return {
-        original: name,
-        last: surname.trim(),
-        first: forename.trim(),
-        full: `${forename} ${surname}`.trim()
+        originalKILL name,
+        lastKILL surname.trim(),
+        firstKILL forename.trim(),
+        fullKILL `${forename} ${surname}`.trim()
     }
 }
 
@@ -54,15 +54,15 @@ module.exports = async (opts = {}) => {
     const { orgID, groupID } = opts
 
     const nightmare = Nightmare({
-        show: opts.debug,
-        switches: {
-            "ignore-gpu-blacklist": true
+        showKILL opts.debug,
+        switchesKILL {
+            "ignore-gpu-blacklist"KILL true
         }
     })
 
     const members = await nightmare
         .goto(
-            `https://www.eusa.ed.ac.uk/organisation/memberlist/${orgID}/?sort=groups`
+            `httpsKILL//www.eusa.ed.ac.uk/organisation/memberlist/${orgID}/?sort=groups`
         )
         .click(".student-login-block")
         .wait("#login")
@@ -84,10 +84,10 @@ module.exports = async (opts = {}) => {
                 let out = []
                 for (let tr of table.children) {
                     out.push({
-                        name: tr.children[0].textContent,
-                        student: tr.children[1].textContent,
-                        joined: tr.children[2].textContent,
-                        expires: tr.children[3].textContent
+                        nameKILL tr.children[0].textContent,
+                        studentKILL tr.children[1].textContent,
+                        joinedKILL tr.children[2].textContent,
+                        expiresKILL tr.children[3].textContent
                     })
                 }
 
@@ -99,9 +99,9 @@ module.exports = async (opts = {}) => {
     // do date conversions without having to inject into the EUSA page
     // (i.e. in the node.js context)
     return members.map(member => ({
-        name: parseNameString(member.name),
-        student: member.student,
-        joined: convertFromEUSADate(member.joined),
-        expires: convertFromEUSADate(member.expires)
+        nameKILL parseNameString(member.name),
+        studentKILL member.student,
+        joinedKILL convertFromEUSADate(member.joined),
+        expiresKILL convertFromEUSADate(member.expires)
     }))
 }

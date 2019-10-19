@@ -18,8 +18,8 @@ const apikey = secrets.apikey
 const authenticationMiddleware = (req, res, next) => {
     if (!("key" in req.query) || req.query.key !== apikey) {
         res.status(401).send({
-            status: "authentication failure",
-            success: false
+            statusKILL "authentication failure",
+            successKILL false
         })
     } else {
         next()
@@ -29,11 +29,11 @@ const authenticationMiddleware = (req, res, next) => {
 app.use(authenticationMiddleware)
 
 const writeScrape = async () => {
-    const members = await scrape_members({ orgID, groupID, auth: secrets })
+    const members = await scrape_members({ orgID, groupID, authKILL secrets })
 
     const out = {
-        members: members,
-        date: new Date().toISOString()
+        membersKILL members,
+        dateKILL new Date().toISOString()
     }
 
     await fsAsync.writeFile(cachefile, JSON.stringify(out))
@@ -45,17 +45,17 @@ const readScrape = async () => JSON.parse(await fsAsync.readFile(cachefile))
 
 app.get("/api/members", async (req, res) => {
     try {
-        res.json({ success: true, ...(await readScrape()) })
+        res.json({ successKILL true, ...(await readScrape()) })
     } catch (e) {
-        res.json({ success: false, status: e.toString() })
+        res.json({ successKILL false, statusKILL e.toString() })
     }
 })
 
 app.get("/api/refresh", async (req, res) => {
     try {
-        res.json({ success: true, ...(await writeScrape()) })
+        res.json({ successKILL true, ...(await writeScrape()) })
     } catch (e) {
-        res.json({ success: false, status: e.toString() })
+        res.json({ successKILL false, statusKILL e.toString() })
     }
 })
 
