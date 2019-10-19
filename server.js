@@ -8,12 +8,11 @@ const config = JSON.parse(fs.readFileSync('./instance/config.json'))
 const app            = express()
 const cachefile      = config.cachefile
 const port           = config.port
+const orgID          = config.orgID
+const groupID        = config.groupID
 
 const writeScrape = async () => {
-    const members = await scrape_members({
-        "orgID": "8868",
-        "groupID": "8872",
-    })
+    const members = await scrape_members({orgID, groupID})
 
     const out = {
         members: members,
