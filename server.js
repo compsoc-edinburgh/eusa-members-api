@@ -3,17 +3,42 @@ const scrape_members = require('./scrape.js')
 const fs             = require('fs')
 const { DateTime }   = require('luxon')
 
-const config = JSON.parse(fs.readFileSync('./instance/config.json'))
-const secrets = JSON.parse(fs.readFileSync('./instance/secret.json'))
+const readJSON = file => JSON.parse(fs.readFileSync(file))
+const config   = readJSON('./instance/config.json')
+const secrets  = readJSON('./instance/secret.json')
 
-const app            = express()
-const cachefile      = config.cachefile
-const port           = config.port
-const orgID          = config.orgID
-const groupID        = config.groupID
+const app       = express()
+const cachefile = config.cachefile
+const port      = config.port
+const orgID     = config.orgID
+const groupID   = config.groupID
+const apikey    = secrets.apikey
+
+const authenticationMiddleware = (req, res, next) => {
+    const expected_header = `Bearer ${apikey}`
+    if (!req.headers.authorization || req.headers.authorization !== expected_header) {
+        res
+            .status(401)
+            .send({
+                status: 'authentication failure',
+                success: false
+            })
+    } else {
+        next()
+    }
+}
+
+app.use(authenticationMiddleware)
 
 const writeScrape = async () => {
-    const members = await scrape_members({orgID, groupID, auth: secrets})
+    const members = await scrape_members({
+        orgID,
+        groupID,
+        auth: {
+            email: secrets.email,
+            password: secrets.password
+        }
+    })
 
     const out = {
         members: members,
@@ -31,13 +56,20 @@ const writeScrape = async () => {
 const readScrape = () => JSON.parse(fs.readFileSync(cachefile))
 
 app.get('/api/members', (req, res) => {
-    res.json(readScrape())
+    try {
+        res.json({ success: true, ...readScrape() })
+    } catch (e) {
+        res.json({ success: false, status: e.toString() })
+
+    }
 })
 
 app.get('/api/refresh', (req, res) => {
     writeScrape()
-        .then(r => res.json(r))
+        .then(r => res.json({ success: true, ...r}))
+        .catch(e => res.json({ success: false, status: e.toString() }))
 })
+
 
 console.log('getting initial scrape...')
 writeScrape()
