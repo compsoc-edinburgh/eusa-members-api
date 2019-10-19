@@ -21,11 +21,34 @@ const parseNameString = name => {
     }
 }
 
+const validateOpts = opts => {
+    if (!Number.isInteger(opts.orgID)) {
+        return new Error("Invalid `orgID` field - not an integer")
+    }
+
+    if (!Number.isInteger(opts.groupID)) {
+        return new Error("Invalid `groupID` field - not an integer")
+    }
+
+    if ("debug" in opts) {
+        const debug = opts.debug;
+        if (debug !== undefined && debug !== false && debug !== true) {
+            return new Error("Invalid `debug` field - expected `undefined`, `false`, or `true`")
+        }
+    }
+
+    return null;
+}
+
 module.exports = (opts = {}) => {
-    const DEBUG = opts.debug === true;
     const {orgID, groupID} = opts;
+    const validationError = validateOpts(opts)
+    if (validationError !== null) {
+        return Promise.reject(validationError)
+    }
+
     const nightmare = Nightmare({
-        show: DEBUG,
+        show: opts.debug,
         switches: {
             'ignore-gpu-blacklist': true
         }
