@@ -1,67 +1,67 @@
-const express = require("express");
-const scrape_members = require("./scrape.js");
-const fs = require("fs");
-const fs_async = require("fs").promises;
-const { DateTime } = require("luxon");
+const express = require("express")
+const scrape_members = require("./scrape.js")
+const fs = require("fs")
+const fs_async = require("fs").promises
+const { DateTime } = require("luxon")
 
-const readJSON = file => JSON.parse(fs.readFileSync(file));
-const config = readJSON("./instance/config.json");
-const secrets = readJSON("./instance/secret.json");
+const readJSON = file => JSON.parse(fs.readFileSync(file))
+const config = readJSON("./instance/config.json")
+const secrets = readJSON("./instance/secret.json")
 
-const app = express();
-const cachefile = config.cachefile;
-const port = config.port;
-const orgID = config.orgID;
-const groupID = config.groupID;
-const apikey = secrets.apikey;
+const app = express()
+const cachefile = config.cachefile
+const port = config.port
+const orgID = config.orgID
+const groupID = config.groupID
+const apikey = secrets.apikey
 
 const authenticationMiddleware = (req, res, next) => {
     if (!("key" in req.query) || req.query.key !== apikey) {
         res.status(401).send({
             status: "authentication failure",
             success: false
-        });
+        })
     } else {
-        next();
+        next()
     }
-};
+}
 
-app.use(authenticationMiddleware);
+app.use(authenticationMiddleware)
 
 const writeScrape = async () => {
-    const members = await scrape_members({ orgID, groupID, auth: secrets });
+    const members = await scrape_members({ orgID, groupID, auth: secrets })
 
     const out = {
         members: members,
         date: new Date().toISOString()
-    };
+    }
 
-    await fs_async.writeFile(cachefile, JSON.stringify(out));
+    await fs_async.writeFile(cachefile, JSON.stringify(out))
 
-    return out;
-};
+    return out
+}
 
-const readScrape = async () => JSON.parse(await fs_async.readFile(cachefile));
+const readScrape = async () => JSON.parse(await fs_async.readFile(cachefile))
 
 app.get("/api/members", async (req, res) => {
     try {
-        res.json({ success: true, ...(await readScrape()) });
+        res.json({ success: true, ...(await readScrape()) })
     } catch (e) {
-        res.json({ success: false, status: e.toString() });
+        res.json({ success: false, status: e.toString() })
     }
-});
+})
 
 app.get("/api/refresh", async (req, res) => {
     try {
-        res.json({ success: true, ...(await writeScrape()) });
+        res.json({ success: true, ...(await writeScrape()) })
     } catch (e) {
-        res.json({ success: false, status: e.toString() });
+        res.json({ success: false, status: e.toString() })
     }
-});
+})
 
-console.log("getting initial scrape...");
+console.log("getting initial scrape...")
 writeScrape().then(() =>
     app.listen(port, () =>
         console.log(`EUSA members api listening on port ${port}!`)
     )
-);
+)
