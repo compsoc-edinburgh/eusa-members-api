@@ -1,7 +1,7 @@
 const express = require("express")
 const scrape_members = require("./scrape.js")
 const fs = require("fs")
-const fs_async = require("fs").promises
+const fsAsync = require("fs").promises
 const { DateTime } = require("luxon")
 
 const readJSON = file => JSON.parse(fs.readFileSync(file))
@@ -36,12 +36,12 @@ const writeScrape = async () => {
         date: new Date().toISOString()
     }
 
-    await fs_async.writeFile(cachefile, JSON.stringify(out))
+    await fsAsync.writeFile(cachefile, JSON.stringify(out))
 
     return out
 }
 
-const readScrape = async () => JSON.parse(await fs_async.readFile(cachefile))
+const readScrape = async () => JSON.parse(await fsAsync.readFile(cachefile))
 
 app.get("/api/members", async (req, res) => {
     try {
