@@ -1,4 +1,5 @@
 # eusa-members-api
+This provides a simple API for getting a list of members of any given EUSA society.
 
 ## get started
 
