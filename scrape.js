@@ -63,9 +63,9 @@ module.exports = (opts = {}) => {
             .type('#password', secrets.password)
             .click('[value=" Login now "]')
             .wait('.member_list_group')
-            .evaluate(() => {
+            .evaluate(node_context => {
                 // executes in browser context
-                let table = document.querySelector(`.member_list_group > h3 > a[href="/organisation/editmembers/${orgID}/${groupID}/?from=members"]`).parentElement.parentElement
+                let table = document.querySelector(`.member_list_group > h3 > a[href="/organisation/editmembers/${node_context.orgID}/${node_context.groupID}/?from=members"]`).parentElement.parentElement
 
                 table = table.querySelector('.msl_table > tbody')
 
@@ -83,7 +83,7 @@ module.exports = (opts = {}) => {
 
                 return out
 
-            })
+            }, {orgID, groupID})
             .end()
             .then(members => {
                 // do date conversions without having to inject into the EUSA page
