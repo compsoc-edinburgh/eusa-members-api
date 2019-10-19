@@ -15,7 +15,7 @@ const groupID   = config.groupID
 const apikey    = secrets.apikey
 
 const authenticationMiddleware = (req, res, next) => {
-    if (!('key' in req.query) || req.query.key !== apikey) {
+    if (!req.query.key || req.query.key !== apikey) {
         res
             .status(401)
             .send({
@@ -48,12 +48,18 @@ const writeScrape = async () => {
 const readScrape = () => JSON.parse(fs.readFileSync(cachefile))
 
 app.get('/api/members', (req, res) => {
-    res.json({ success: true, ...readScrape()})
+    try {
+        res.json({ success: true, ...readScrape() })
+    } except (e) {
+        res.json({ success: false, status: e.toString() })
+
+    }
 })
 
 app.get('/api/refresh', (req, res) => {
     writeScrape()
         .then(r => res.json({ success: true, ...r}))
+        .catch(e => res.json({ success: false, status: e.toString() }))
 })
 
 
