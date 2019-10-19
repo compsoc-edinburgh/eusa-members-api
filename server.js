@@ -4,16 +4,19 @@ const fs             = require('fs')
 const { DateTime }   = require('luxon')
 
 const config = JSON.parse(fs.readFileSync('./instance/config.json'))
+const secrets = JSON.parse(fs.readFileSync('./instance/secret.json'))
 
 const app            = express()
 const cachefile      = config.cachefile
 const port           = config.port
+const orgID          = config.orgID
+const groupID        = config.groupID
 
 const writeScrape = async () => {
-    const members = await scrape_members()
+    const members = await scrape_members({orgID, groupID, auth: secrets})
 
     const out = {
-        members: members, 
+        members: members,
         date: new Date().toISOString()
     }
 
