@@ -21,11 +21,34 @@ const parseNameString = name => {
     }
 }
 
+const validateOpts = opts => {
+    if (!Number.isInteger(opts.orgID)) {
+        return new Error("Invalid `orgID` field - not an integer")
+    }
+
+    if (!Number.isInteger(opts.groupID)) {
+        return new Error("Invalid `groupID` field - not an integer")
+    }
+
+    if ("debug" in opts) {
+        const debug = opts.debug;
+        if (debug !== undefined && debug !== false && debug !== true) {
+            return new Error("Invalid `debug` field - expected `undefined`, `false`, or `true`")
+        }
+    }
+
+    return null;
+}
+
 module.exports = (opts = {}) => {
-    const DEBUG = opts.debug === true;
     const {orgID, groupID} = opts;
+    const validationError = validateOpts(opts)
+    if (validationError !== null) {
+        return Promise.reject(validationError)
+    }
+
     const nightmare = Nightmare({
-        show: DEBUG,
+        show: opts.debug,
         switches: {
             'ignore-gpu-blacklist': true
         }
@@ -40,9 +63,9 @@ module.exports = (opts = {}) => {
             .type('#password', secrets.password)
             .click('[value=" Login now "]')
             .wait('.member_list_group')
-            .evaluate(() => {
+            .evaluate(node_context => {
                 // executes in browser context
-                let table = document.querySelector(`.member_list_group > h3 > a[href="/organisation/editmembers/${orgID}/${groupID}/?from=members"]`).parentElement.parentElement
+                let table = document.querySelector(`.member_list_group > h3 > a[href="/organisation/editmembers/${node_context.orgID}/${node_context.groupID}/?from=members"]`).parentElement.parentElement
 
                 table = table.querySelector('.msl_table > tbody')
 
@@ -60,7 +83,7 @@ module.exports = (opts = {}) => {
 
                 return out
 
-            })
+            }, {orgID, groupID})
             .end()
             .then(members => {
                 // do date conversions without having to inject into the EUSA page
