@@ -1,6 +1,7 @@
 const express        = require('express')
 const scrape_members = require('./scrape.js')
 const fs             = require('fs')
+const fsAsync       = require('fs').promises
 const { DateTime }   = require('luxon')
 
 const readJSON = file => JSON.parse(fs.readFileSync(file))
@@ -45,7 +46,7 @@ const writeScrape = async () => {
         date: new Date().toISOString()
     }
 
-    fs.writeFileSync(
+    await fsAsync.writeFile(
         cachefile,
         JSON.stringify(out)
     )
@@ -53,21 +54,21 @@ const writeScrape = async () => {
     return out
 }
 
-const readScrape = () => JSON.parse(fs.readFileSync(cachefile))
-
-app.get('/api/members', (req, res) => {
+const readScrape = async () => JSON.parse(await fsAsync.readFile(cachefile))
+app.get('/api/members', async (req, res) => {
     try {
-        res.json({ success: true, ...readScrape() })
-    } catch (e) {
-        res.json({ success: false, status: e.toString() })
-
+        res.json({ success: true, ...(await readScrape())})
+    } catch(e) {
+        res.json({ success: false, status:e.toString()})
     }
 })
 
-app.get('/api/refresh', (req, res) => {
-    writeScrape()
-        .then(r => res.json({ success: true, ...r}))
-        .catch(e => res.json({ success: false, status: e.toString() }))
+app.get('/api/refresh', async (req, res) => {
+    try{
+        res.json({ success: true, ...(await writeScrape())})
+    } catch(e) {
+        res.json({ success: false, status:e.toString()})
+    }
 })
 
 

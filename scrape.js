@@ -20,38 +20,33 @@ const parseNameString = name => {
 
 const validateOpts = opts => {
     if (!Number.isInteger(opts.orgID)) {
-        return new Error("Invalid `orgID` field - not an integer")
+        throw new Error("Invalid `orgID` field - not an integer")
     }
 
     if (!Number.isInteger(opts.groupID)) {
-        return new Error("Invalid `groupID` field - not an integer")
+        throw new Error("Invalid `groupID` field - not an integer")
     }
 
     if ("debug" in opts) {
         const debug = opts.debug;
         if (debug !== undefined && debug !== false && debug !== true) {
-            return new Error("Invalid `debug` field - expected `undefined`, `false`, or `true`")
+            throw new Error("Invalid `debug` field - expected `undefined`, `false`, or `true`")
         }
     }
 
     if ("auth" in opts === false) {
-        return new Error("Missing `auth` object")
+        throw new Error("Missing `auth` object")
     } else if (typeof opts.auth.email !== "string") {
-        return new Error(`Invalid \`auth.email\` field - expected "string", got "${typeof opts.auth.email}"`)
+        throw new Error(`Invalid \`auth.email\` field - expected "string", got "${typeof opts.auth.email}"`)
     } else if (typeof opts.auth.password !== "string") {
-        return new Error(`Invalid \`auth.password\` field - expected "string", got "${typeof opts.auth.password}"`)
+        throw new Error(`Invalid \`auth.password\` field - expected "string", got "${typeof opts.auth.password}"`)
     }
-
-    return null;
 }
 
-module.exports = (opts = {}) => {
+module.exports = async (opts = {}) => {
+    validateOpts(opts)
     const {orgID, groupID} = opts;
-    const validationError = validateOpts(opts)
-    if (validationError !== null) {
-        return Promise.reject(validationError)
-    }
-
+    
     const nightmare = Nightmare({
         show: opts.debug,
         switches: {
@@ -59,8 +54,7 @@ module.exports = (opts = {}) => {
         }
     })
 
-    return new Promise((resolve, reject) => {
-        nightmare
+    const members = await nightmare
             .goto(`https://www.eusa.ed.ac.uk/organisation/memberlist/${orgID}/?sort=groups`)
             .click('.student-login-block')
             .wait('#login')
@@ -90,20 +84,12 @@ module.exports = (opts = {}) => {
 
             }, {orgID, groupID})
             .end()
-            .then(members => {
-                // do date conversions without having to inject into the EUSA page
-                // (i.e. in the node.js context)
-                members = members.map(member => ({
-                    name: parseNameString(member.name),
-                    student: member.student,
-                    joined: convertFromEUSADate(member.joined),
-                    expires: convertFromEUSADate(member.expires)
-                }))
-
-                resolve(members)
-            })
-            .catch(error => {
-                reject(error)
-            })
-    })
+    // do date conversions without having to inject into the EUSA page
+    // (i.e. in the node.js context)
+    return members.map(member => ({
+        name: parseNameString(member.name),
+        student: member.student,
+        joined: convertFromEUSADate(member.joined),
+        expires: convertFromEUSADate(member.expires)
+    }))
 }
