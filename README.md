@@ -11,11 +11,19 @@ $ yarn install
 Then edit `config.json`:
 
 ```
+    "orgID": 8868,
+    "groupID": 8872,
+
+    "port": 3000,
+    "cachefile": "instance/cache.json"
+```
+
+And also `secret.json`:
+
+```
 {
     "email": "sXXXXXXX@ed.ac.uk",
-    "password": "your-password-here",
-    "orgID": 8868,
-    "groupID": 8872
+    "password": "your-password-here"
 }
 ```
 

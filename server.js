@@ -30,7 +30,7 @@ const authenticationMiddleware = (req, res, next) => {
 app.use(authenticationMiddleware)
 
 const writeScrape = async () => {
-    const members = await scrape_members({orgID, groupID, debug: false})
+    const members = await scrape_members({orgID, groupID, auth: secrets})
 
     const out = {
         members: members,
