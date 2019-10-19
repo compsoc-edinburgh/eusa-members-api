@@ -31,33 +31,37 @@ const authenticationMiddleware = (req, res, next) => {
 app.use(authenticationMiddleware)
 
 const writeScrape = async () => {
-    try {
-        const members = await scrape_members({orgID, groupID, auth: secrets})
+    const members = await scrape_members({orgID, groupID, auth: secrets})
 
-        const out = {
-            members: members,
-            date: new Date().toISOString()
-        }
-
-        await fs_async.writeFile(
-            cachefile,
-            JSON.stringify(out)
-        )
-
-        return out
-    } catch(e) {
-        console.error(e)
+    const out = {
+        members: members,
+        date: new Date().toISOString()
     }
+
+    await fs_async.writeFile(
+        cachefile,
+        JSON.stringify(out)
+    )
+
+    return out
 }
 
 const readScrape = async () => JSON.parse(await fs_async.readFile(cachefile))
 
 app.get('/api/members', async (req, res) => {
-    res.json({ success: true, ...(await readScrape())})
+    try {
+        res.json({ success: true, ...(await readScrape())})
+    } catch(e) {
+        res.json({ success: false, status:e.toString()})
+    }
 })
 
 app.get('/api/refresh', async (req, res) => {
-    res.json({ success: true, ...(await writeScrape())})
+    try{
+        res.json({ success: true, ...(await writeScrape())})
+    } catch(e) {
+        res.json({ success: false, status:e.toString()})
+    }
 })
 
 
