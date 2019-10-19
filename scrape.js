@@ -1,9 +1,6 @@
 const Nightmare    = require('nightmare')
 const { DateTime } = require('luxon')
 
-const fs      = require('fs')
-const secrets = JSON.parse(fs.readFileSync('./instance/secret.json'))
-
 const convertFromEUSADate = edate => {
     return DateTime
         .fromFormat(edate, 'dd/MM/yyyy HH:mm')
@@ -37,6 +34,14 @@ const validateOpts = opts => {
         }
     }
 
+    if ("auth" in opts === false) {
+        return new Error("Missing `auth` object")
+    } else if (typeof opts.auth.email !== "string") {
+        return new Error(`Invalid \`auth.email\` field - expected "string", got "${typeof opts.auth.email}"`)
+    } else if (typeof opts.auth.password !== "string") {
+        return new Error(`Invalid \`auth.password\` field - expected "string", got "${typeof opts.auth.password}"`)
+    }
+
     return null;
 }
 
@@ -59,8 +64,8 @@ module.exports = (opts = {}) => {
             .goto(`https://www.eusa.ed.ac.uk/organisation/memberlist/${orgID}/?sort=groups`)
             .click('.student-login-block')
             .wait('#login')
-            .type('#login', secrets.email)
-            .type('#password', secrets.password)
+            .type('#login', opts.auth.email)
+            .type('#password', opts.auth.password)
             .click('[value=" Login now "]')
             .wait('.member_list_group')
             .evaluate(node_context => {
