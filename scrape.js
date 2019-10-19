@@ -64,8 +64,8 @@ module.exports = (opts = {}) => {
             .goto(`https://www.eusa.ed.ac.uk/organisation/memberlist/${orgID}/?sort=groups`)
             .click('.student-login-block')
             .wait('#login')
-            .type('#login', opts.auth.email)
-            .type('#password', opts.auth.password)
+            .insert('#login', opts.auth.email)
+            .insert('#password', opts.auth.password)
             .click('[value=" Login now "]')
             .wait('.member_list_group')
             .evaluate(node_context => {
