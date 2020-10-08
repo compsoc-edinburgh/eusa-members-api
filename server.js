@@ -56,7 +56,6 @@ const writeScrape = async () => {
 }
 
 const readScrape = async () => JSON.parse(await fsAsync.readFile(cachefile))
-
 app.get('/api/members', async (req, res) => {
     try {
         res.json({ success: true, ...(await readScrape())})
