@@ -16,7 +16,9 @@ const groupID   = config.groupID
 const apikey    = secrets.apikey
 
 const authenticationMiddleware = (req, res, next) => {
-    if (!('key' in req.query) || req.query.key !== apikey) {
+
+    const expected_header = `Bearer ${apikey}`
+    if (!req.headers.authorization || req.headers.authorization !== expected_header) {
         res
             .status(401)
             .send({
@@ -31,7 +33,14 @@ const authenticationMiddleware = (req, res, next) => {
 app.use(authenticationMiddleware)
 
 const writeScrape = async () => {
-    const members = await scrape_members({orgID, groupID, auth: secrets})
+    const members = await scrape_members({
+        orgID,
+        groupID,
+        auth: {
+            email: secrets.email,
+            password: secrets.password
+        }
+    })
 
     const out = {
         members: members,
