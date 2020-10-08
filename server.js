@@ -16,6 +16,7 @@ const groupID   = config.groupID
 const apikey    = secrets.apikey
 
 const authenticationMiddleware = (req, res, next) => {
+
     const expected_header = `Bearer ${apikey}`
     if (!req.headers.authorization || req.headers.authorization !== expected_header) {
         res
