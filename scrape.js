@@ -59,8 +59,11 @@ module.exports = async (opts = {}) => {
             .click('.student-login-block')
             .wait('#login')
             .insert('#login', opts.auth.email)
+            .click('[value="Continue"]')
+            .wait('#password')
             .insert('#password', opts.auth.password)
-            .click('[value=" Login now "]')
+            .wait('[value="Log in"]')
+            .click('[value="Log in"]')
             .wait('.member_list_group')
             .evaluate(node_context => {
                 // executes in browser context
