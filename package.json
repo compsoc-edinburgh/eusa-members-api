@@ -7,8 +7,12 @@
   "author": "patrick kage",
   "license": "MIT",
   "dependencies": {
+    "ejs": "^3.1.5",
     "express": "^4.17.1",
+    "express-session": "^1.17.1",
     "luxon": "^1.19.3",
-    "nightmare": "^3.0.2"
+    "nightmare": "^3.0.2",
+    "passport": "^0.4.1",
+    "passport-google-oauth20": "^2.0.0"
   }
 }
