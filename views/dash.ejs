@@ -26,7 +26,7 @@
         <main>
             <h1> Dashboard </h1>
 
-            <p> General information about the API status.</p>
+            <p> General information about the Members API.</p>
 
             <ul>
                 <li> Login email: <strong><%= user.email %></strong> (<%= user.email_verified ? 'verified' : 'nnot verified' %>) </li>
@@ -39,6 +39,8 @@
                 <summary>Developer</summary>
                 <ul>
                     <li>Current API key: <span class="mono"><%= apikey %></span></li>
+                    <li>Sendy installation: <a href="<%= sendy.url %>"><%= sendy.url %></a></li>
+                    <li> Sendy list: <span class="mono"><%= sendy.list %></span></li>
                 </ul>
             </details>
 
@@ -46,7 +48,7 @@
 
             <p>
                 <a href="/dashboard/rescrape">Rescrape &rarr;</a> <br/>
-                <a href="/dashboard/synchronize">Sync with Sendy &rarr;</a>
+                <a href="/dashboard/sendy_sync">Sync with Sendy &rarr;</a>
             </p>
 
             <h1> Exports </h1>

@@ -1,5 +1,6 @@
 const express        = require('express')
 const scrape_members = require('./scrape.js')
+const sendy_sync     = require('./sendy')
 const fs             = require('fs')
 const fsAsync        = require('fs').promises
 const { DateTime }   = require('luxon')
@@ -81,7 +82,12 @@ api_app.get('/refresh', async (req, res) => {
 })
 
 api_app.get('/sendy_sync', async (req, res) => {
-
+    try {
+        const subscribed = await sendy_sync((await readScrape()).members, secrets.sendy)
+        res.json({ success: true })
+    } catch (e) {
+        res.json({ success: false, status: 'An error occurred.' })
+    }
 })
 
 /* --- FRONTEND --- */
@@ -169,15 +175,30 @@ app.get('/dashboard',
             latest,
             csv: makecsv(latest.members),
             render_time: new Date().toISOString(),
+            sendy: {
+                url: secrets.sendy.sendy_url,
+                list: secrets.sendy.target_list
+            },
             apikey: apikey,
             user: req.user
         })
     }
 )
+
 app.get('/dashboard/rescrape',
     login_guard,
     (req, res) => {
         res.render('rescrape', {
+            apikey,
+            user: req.user
+        })
+    }
+)
+
+app.get('/dashboard/sendy_sync',
+    login_guard,
+    (req, res) => {
+        res.render('sendy_sync', {
             apikey,
             user: req.user
         })
@@ -193,7 +214,6 @@ app.use('/api', api_app)
 
 console.log('getting initial scrape...')
 
-const dummy = async () => {}
-//writeScrape()
-dummy()
+//const dummy = async () => {} // useful for debugging
+writeScrape()
     .then(() => app.listen(port, () => console.log(`EUSA members api listening on port ${port}!`)))
