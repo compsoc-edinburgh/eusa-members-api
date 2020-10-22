@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>EUSA Members API</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="/static/index.css" rel="stylesheet">
+        <link href="/static/compsoc-icon.png" rel="icon">
+    </head>
+
+    <body>
+        <nav>
+            <div class="nav__brand">
+                <img src="/static/compsoc-icon.png" alt="compsoc icon"/>
+                <span class="nav__title">EUSA Members API</span>
+            </div>
+            <div class="nav__login">
+                <span class="nav__name"><%= user.name %></span>
+                <img src="<%= user.photo %>" alt="<%= user.name %> photo"/>
+
+                <a class="nav__logout" href="/auth/logout">
+                    <span>logout</span>
+                </a>
+            </div>
+        </nav>
+        <main>
+            <h1> Synchronizing... </h1>
+            <p id="status">
+                Synchronizing the cached member list with Sendy. This may take 5-30 seconds.
+                Please do not refresh the page!
+            </p>
+            
+            <div class="spinner" id="spinner"></div>
+
+            <a href="/dashboard" id="return" style="display: none;">
+                Return to the dashboard &rarr;
+            </a>
+        </main>
+
+        <script type="text/javascript">
+            window.apikey = '<%- apikey %>'
+
+            const statusP = document.querySelector('#status')
+            const returnLink = document.querySelector('#return')
+            const spinner = document.querySelector('#spinner')
+
+            fetch('/api/sendy_sync', {
+                headers: {
+                    'Authorization': `Bearer ${window.apikey}`
+                }
+            })
+                .then(r => r.json())
+                .then(r => {
+                    returnLink.style.display = 'inline'
+                    spinner.style.display = 'none';
+                    if (r.success) {
+                        location.href = '/dashboard'
+                        statusP.innerText = 'Scrape successful!'
+                    } else {
+                        statusP.innerHTML = `Something went wrong! Here's what we know: <br/> <code> ${r.status} </code>`
+                    }
+                })
+                .catch(() => {
+                    returnLink.style.display = 'inline'
+                    spinner.style.display = 'none';
+                    statusP.innerText = `Something went wrong! And we don't know what it is, either.`
+                })
+        </script>
+    </body>
+</html>
