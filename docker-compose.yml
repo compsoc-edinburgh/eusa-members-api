@@ -1,9 +1,12 @@
 version: "3.7"
 services:
     api:
-        image: "TBD"
+        image: "eusa-members-api"
         ports:
             - "3000:3000"
         volumes:
-            - "instance/instance"
+            - type: bind
+              source: ./instance
+              target: /instance
+
         command: "server.js"
