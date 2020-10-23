@@ -7,6 +7,6 @@ services:
         volumes:
             - type: bind
               source: ./instance
-              target: /instance
+              target: /workspace/instance
 
         command: "server.js"
