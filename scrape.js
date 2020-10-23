@@ -56,14 +56,11 @@ module.exports = async (opts = {}) => {
 
     const members = await nightmare
             .goto(`https://www.eusa.ed.ac.uk/organisation/memberlist/${orgID}/?sort=groups`)
-            .click('.student-login-block')
-            .wait('#login')
-            .insert('#login', opts.auth.email)
-            .click('[value="Continue"]')
-            .wait('#password')
-            .insert('#password', opts.auth.password)
-            .wait('[value="Log in"]')
-            .click('[value="Log in"]')
+            .click('.login-block.slider') // service account flow
+            .wait(1000)
+            .insert('#ctl00_logincontrol_UserName', opts.auth.email)
+            .insert('#ctl00_logincontrol_Password', opts.auth.password)
+            .click('#ctl00_logincontrol_btnLogin')
             .wait('.member_list_group')
             .evaluate(node_context => {
                 // executes in browser context
@@ -96,3 +93,13 @@ module.exports = async (opts = {}) => {
         expires: convertFromEUSADate(member.expires)
     }))
 }
+            /* // for non-service account flows
+            .click('.student-login-block')
+            .wait('#login')
+            .insert('#login', opts.auth.email)
+            .click('[value="Continue"]')
+            .wait('#password')
+            .insert('#password', opts.auth.password)
+            .wait('[value="Log in"]')
+            .click('[value="Log in"]')
+            */
