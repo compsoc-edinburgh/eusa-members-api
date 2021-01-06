@@ -7,7 +7,7 @@
   "author": "patrick kage",
   "license": "MIT",
   "dependencies": {
-    "axios": "^0.20.0",
+    "axios": "^0.21.1",
     "ejs": "^3.1.5",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
